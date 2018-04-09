@@ -1,0 +1,19 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "An Amazon-like storefront featuring MySQL and Node.js in its implementation. The app takes in orders from customers and depletes stock from the store's inventory.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Bamazon"
+  ],
+  "author": "Jeremy Knappe",
+  "license": "ISC",
+  "dependencies": {
+    "cli-table": "^0.3.1",
+    "inquirer": "^5.2.0",
+    "mysql": "^2.15.0"
+  }
+}
