@@ -9,27 +9,34 @@ var connection = mysql.createConnection({
     port: 8889,
     user: "root", 
     password: "root",
-    database: "bamazon_db"
+    database: "bamazon_db"    
+});
+
+connection.connect(function (err) {
+    if (err) throw err
+    displayAll();
+    console.log("Connected");
+    
 });
 
 //Functions
 function displayAll() {
     //show all ids, names, and products from database.
-    connection.query('SELECT * FROM Products', function (err, res) {
+    connection.query('SELECT * FROM Products', function (err, response) {
         if (err) throw err;
         //New instance of our constructor
         var productsDisplayTable = new Table({
             //declare the value categories
-            head: ['Item ID', 'Product Name', 'Category', 'Price', 'Quantity'],
-            //set widths to scale
-            colWidths: [10, 30, 18, 10, 14]
+            head: ['Item ID', 'Product Name', 'Department', 'Price', 'Quantity'],
+            // //set widths to scale
+            // colWidths: [10, 30, 18, 10, 14]
         });
         //for each row of the loop
         for (i = 0; i < response.length; i++) {
             //push data to table
             productsDisplayTable.push(
-                [response[i].ItemID, response[i].ProductName, response[i].DepartmentName, response[i].Price, response[i].StockQuantity]
-            );
+                [response[i].item_id, response[i].product_name, response[i].department_name, response[i].price, response[i].stock_quantity]
+            );            
         }
         //log the completed table to console
         console.log(productsDisplayTable.toString());
@@ -56,30 +63,30 @@ function inquireForPurchase() {
         var quantityDesired = answers.Quantity;
         var IDDesired = answers.ID;
         purchaseFromDatabase(IDDesired, quantityDesired);
+        
     });
 
 }; //end inquireForPurchase
 
 function purchaseFromDatabase(ID, quantityNeeded) {
     //check quantity of desired purchase. Minus quantity of the itemID from database if possible. Else inform user "Quantity desired not in stock" 
-    connection.query('SELECT * FROM Products WHERE ItemID = ' + ID, function (error, response) {
+    connection.query('SELECT * FROM products WHERE item_id = ' + ID, function (error, response) {
         if (error) { console.log(error) };
 
+
         //if in stock
-        if (quantityNeeded <= response[0].StockQuantity) {
+        if (quantityNeeded <= response[0].stock_quantity) {
             //calculate cost
-            var totalCost = response[0].Price * quantityNeeded;
+            var totalCost = response[0].price * quantityNeeded;
             //inform user
             console.log("We have what you need! I'll have your order right out!");
-            console.log("Your total cost for " + quantityNeeded + " " + response[0].ProductName + " is " + totalCost + ". Thank you for your Business!");
+            console.log("Your total cost for " + quantityNeeded + " " + response[0].product_name + " is " + totalCost + ". Thank you for your business!");
             //update database, minus purchased quantity
-            connection.query('UPDATE Products SET StockQuantity = StockQuantity - ' + quantityNeeded + ' WHERE ItemID = ' + ID);
+            connection.query('UPDATE Products SET stock_quantity = stock_quantity - ' + quantityNeeded + ' WHERE item_id = ' + ID);
         } else {
-            console.log("We apologize. We don't have enough " + response[0].ProductName + " to fulfill your order.");
+            console.log("We apologize. We don't have enough " + response[0].product_name + " to fulfill your order.");
         };
         displayAll();
     });
 
 }; //end purchaseFromDatabase
-
-displayAll();
